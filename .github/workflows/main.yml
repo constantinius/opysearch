@@ -26,7 +26,7 @@ jobs:
         pytest
     - name: Run code linting
       run: |
-        flake8 opynsearch tests
+        flake8 opynsearch
     - name: Run type checking
       run: |
         mypy opynsearch

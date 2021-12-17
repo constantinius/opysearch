@@ -89,5 +89,4 @@ def test_parse_detailed():
         languages=["en-us"],
         output_encodings=["UTF-8"],
         input_encodings=["UTF-8"],
-
     )

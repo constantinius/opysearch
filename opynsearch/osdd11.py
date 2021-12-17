@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import cast, Callable, List, Optional, TypeVar, Union, BinaryIO
 from lxml.etree import QName, parse as parse_xml, _Element as Element, _ElementTree as ElementTree
 from io import BytesIO
@@ -53,15 +52,15 @@ def parse_step(value: str) -> StepType:
         pass
     return value
 
+
 def parse_osdd11(source: Union[BinaryIO, bytes]) -> Description:
     if isinstance(source, bytes):
         source = BytesIO(source)
     tree: Union[Element, ElementTree] = parse_xml(source)
     root = tree if isinstance(tree, Element) else tree.getroot()
 
-
     if QName(root) != QName(NS_OSDD, "OpenSearchDescription"):
-        raise ValueError(f"Node is not a valid OpenSearch 1.1 description")
+        raise ValueError(f"Node {root} is not a valid OpenSearch 1.1 description")
 
     return Description(
         short_name=root.findtext("os:ShortName", namespaces=NAMESPACES),

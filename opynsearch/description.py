@@ -1,6 +1,6 @@
 from enum import Enum
 from dataclasses import dataclass, field
-from typing import Dict, List, NamedTuple, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 
 @dataclass
@@ -11,6 +11,7 @@ class Option:
 
 LimitType = Union[int, float, str]  # TODO: datetime?
 StepType = Union[int, float, str]  # TODO timedelta?
+
 
 @dataclass
 class Parameter:

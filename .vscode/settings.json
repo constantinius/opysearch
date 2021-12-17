@@ -1,3 +1,5 @@
 {
-    "python.pythonPath": "/Users/fabian/dev/opynsearch/.venv/bin/python"
+    "python.pythonPath": "/Users/fabian/dev/opynsearch/.venv/bin/python",
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true
 }

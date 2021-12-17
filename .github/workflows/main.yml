@@ -1,0 +1,33 @@
+name: build ⚙️
+
+on: [ push, pull_request ]
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9, 3.10]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      name: Setup Python ${{ matrix.python-version }}
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: pip
+    - name: Install requirements
+      run: |
+        pip install -r requirements-test.txt
+        pip install -r requirements-dev.txt
+        pip install .
+        mypy --install-types --non-interactive pygeofilter
+    - name: Run unit tests
+      run: |
+        pytest
+    - name: Run code linting
+      run: |
+        flake8 opynsearch tests
+    - name: Run type checking
+      run: |
+        mypy opynsearch
+

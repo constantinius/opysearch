@@ -1,0 +1,2 @@
+# opysearch
+OpenSearch client library

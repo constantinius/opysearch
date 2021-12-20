@@ -29,13 +29,26 @@ class Parameter:
     options: List[Option] = field(default_factory=list)
 
 
+class HttpMethod(Enum):
+    OPTIONS = "OPTIONS"
+    GET = "GET"
+    HEAD = "HEAD"
+    POST = "POST"
+    PUT = "PUT"
+    DELETE = "DELETE"
+    TRACE = "TRACE"
+    CONNECT = "CONNECT"
+
+
 @dataclass
 class Url:
     template: str
     type: str
-    rel: Optional[str] = None
+    rel: Optional[str] = "results"
     index_offset: int = 1
     page_offset: int = 1
+    method: HttpMethod = HttpMethod.GET
+    enctype: Optional[str] = None
     parameters: List[Parameter] = field(default_factory=list)
 
 

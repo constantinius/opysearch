@@ -69,9 +69,11 @@ def parse_osdd11(source: Union[BinaryIO, bytes]) -> Description:
             Url(
                 template=url.attrib["template"],
                 type=url.attrib["type"],
-                rel=url.attrib.get("rel"),
+                rel=url.attrib.get("rel", "results"),
                 index_offset=int(url.attrib.get("indexOffset", 1)),
                 page_offset=int(url.attrib.get("pageOffset", 1)),
+                method=HttpMethod(url.get("method", "GET").upper()),
+                enctype=url.get("enctype"),
                 parameters=[
                     Parameter(
                         name=param.attrib["name"],

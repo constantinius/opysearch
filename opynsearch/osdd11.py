@@ -24,10 +24,10 @@ NAMESPACES = {
     "param": NS_PARAM,
 }
 TYPEMAP = {
-    int: str,
-    float: str,
-    datetime: datetime.isoformat,
-    timedelta: lambda td: f"PT{td.total_seconds()}S"
+    int: lambda _, v: str(v),
+    float: lambda _, v: str(v),
+    datetime: lambda _, v: datetime.isoformat(v),
+    timedelta: lambda _, td: f"PT{td.total_seconds()}S"
 }
 
 OS = ElementMaker(
@@ -250,11 +250,11 @@ def encode_osdd11(description: Description, **encode_kwargs: Any) -> Element:
                 ],
                 template=url.template,
                 type=url.type,
-                rel=url.rel,
-                indexOffset=url.index_offset,
-                pageOffset=url.page_offset,
+                rel=url.rel if url.rel != "results" else None,
+                indexOffset=url.index_offset if url.index_offset != 1 else None,
+                pageOffset=url.page_offset if url.page_offset != 1 else None,
                 **{
-                    f"{{{NS_PARAM}}}method": url.method.value if url.method.value != HttpMethod.GET else None,
+                    f"{{{NS_PARAM}}}method": url.method.value if url.method != HttpMethod.GET else None,
                     f"{{{NS_PARAM}}}enctype": url.enctype,
                 }
             )
@@ -286,7 +286,7 @@ def encode_osdd11(description: Description, **encode_kwargs: Any) -> Element:
                 inputEncoding=query.input_encoding,
                 outputEncoding=query.output_encoding,
                 **{
-                    f"{{{name[0]}}}{name}": value
+                    f"{{{name[0]}}}{name[1]}" if name[0] is not None else name[1]: value
                     for name, value in query.extra_parameters.items()
                 },
             )
@@ -296,14 +296,14 @@ def encode_osdd11(description: Description, **encode_kwargs: Any) -> Element:
             OS("Attribution", description.attribution) if description.attribution else None,
             OS("SyndicationRight", description.syndication_right.value) if description.syndication_right != SyndicationRight.open else None,
             OS("AdultContent", "true") if description.adult_content else None,
-        ] + [
+        ] + ([
             OS("Language", language)
             for language in description.languages
-        ] + [
+        ] if description.languages != ["*"] else []) + ([
             OS("InputEncoding", input_encoding)
             for input_encoding in description.input_encodings
-        ] + [
+        ] if description.input_encodings != ["UTF-8"] else []) + ([
             OS("OutputEncoding", output_encoding)
             for output_encoding in description.output_encodings
-        ])
+        ] if description.output_encodings != ["UTF-8"] else []))
     )

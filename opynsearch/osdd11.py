@@ -1,10 +1,21 @@
-from typing import cast, Callable, List, Optional, TypeVar, Union, BinaryIO
-from lxml.etree import QName, parse as parse_xml, _Element as Element, _ElementTree as ElementTree
+from datetime import datetime, timedelta
 from io import BytesIO
+from typing import Any, cast, Callable, List, Optional, TypeVar, Union, BinaryIO
+
+from lxml.etree import QName, parse as parse_xml, _Element as Element, _ElementTree as ElementTree
+from lxml.builder import ElementMaker as LxmlElementMaker
 
 from .description import (
-    Description, LimitType, StepType, SyndicationRight, Url, Image, Query, Parameter, Option
+    Description, LimitType, StepType, SyndicationRight, Url, Image, Query, Parameter, Option,
+    HttpMethod
 )
+
+class ElementMaker(LxmlElementMaker):
+    def __call__(self, tag, *children, **attrib):
+        children = [child for child in children if child is not None]
+        attrib = {k: v for k, v in attrib.items() if v is not None}
+        return super().__call__(tag, *children, **attrib)
+
 
 NS_OSDD = "http://a9.com/-/spec/opensearch/1.1/"
 NS_PARAM = "http://a9.com/-/spec/opensearch/extensions/parameters/1.0/"
@@ -12,7 +23,23 @@ NAMESPACES = {
     "os": NS_OSDD,
     "param": NS_PARAM,
 }
+TYPEMAP = {
+    int: str,
+    float: str,
+    datetime: datetime.isoformat,
+    timedelta: lambda td: f"PT{td.total_seconds()}S"
+}
 
+OS = ElementMaker(
+    typemap=TYPEMAP,
+    namespace=NS_OSDD,
+    nsmap={None: NS_OSDD, "parameter": NS_PARAM}
+)
+PARAM = ElementMaker(
+    typemap=TYPEMAP,
+    namespace=NS_PARAM,
+    nsmap={None: NS_OSDD, "parameter": NS_PARAM}
+)
 
 T = TypeVar("T", int, float, str, SyndicationRight, List[str])
 
@@ -190,4 +217,93 @@ def parse_osdd11(source: Union[BinaryIO, bytes]) -> Description:
             enc.text
             for enc in root.findall("os:OutputEncoding", namespaces=NAMESPACES)
         ] or ["UTF-8"],
+    )
+
+
+def encode_osdd11(description: Description, **encode_kwargs: Any) -> Element:
+    return OS(
+        "OpenSearchDescription",
+        OS("ShortName", description.short_name),
+        OS("Description", description.description),
+        *([
+            OS(
+                "Url", *[
+                    PARAM(
+                        "Parameter",
+                        name=parameter.name,
+                        value=parameter.value,
+                        minimum=parameter.minimum,
+                        maximum=parameter.maximum,
+                        pattern=parameter.pattern,
+                        title=parameter.title,
+                        minExclusive=parameter.min_exclusive,
+                        maxExclusive=parameter.max_exclusive,
+                        minInclusive=parameter.min_inclusive,
+                        maxInclusive=parameter.max_inclusive,
+                        step=parameter.step,
+                        *[
+                            PARAM("Option", value=option.value, label=option.label)
+                            for option in parameter.options
+                        ]
+                    )
+                    for parameter in url.parameters
+                ],
+                template=url.template,
+                type=url.type,
+                rel=url.rel,
+                indexOffset=url.index_offset,
+                pageOffset=url.page_offset,
+                **{
+                    f"{{{NS_PARAM}}}method": url.method.value if url.method.value != HttpMethod.GET else None,
+                    f"{{{NS_PARAM}}}enctype": url.enctype,
+                }
+            )
+            for url in description.urls
+        ] + [
+            OS("Tags", " ".join(description.tags)) if description.tags else None,
+        ] + [
+            OS(
+                "Image",
+                width=image.width,
+                height=image.height,
+                type=image.type,
+            )
+            for image in description.images
+        ] + [
+            OS("LongName", description.long_name) if description.long_name else None,
+            OS("Contact", description.contact) if description.contact else None,
+        ] + [
+            OS(
+                "Query",
+                role=query.role,
+                title=query.title,
+                totalResults=query.total_results,
+                searchTerms=query.search_terms,
+                count=query.count,
+                startIndex=query.start_index,
+                startPage=query.start_page,
+                language=query.language,
+                inputEncoding=query.input_encoding,
+                outputEncoding=query.output_encoding,
+                **{
+                    f"{{{name[0]}}}{name}": value
+                    for name, value in query.extra_parameters.items()
+                },
+            )
+            for query in description.queries
+        ] + [
+            OS("Developer", description.developer) if description.developer else None,
+            OS("Attribution", description.attribution) if description.attribution else None,
+            OS("SyndicationRight", description.syndication_right.value) if description.syndication_right != SyndicationRight.open else None,
+            OS("AdultContent", "true") if description.adult_content else None,
+        ] + [
+            OS("Language", language)
+            for language in description.languages
+        ] + [
+            OS("InputEncoding", input_encoding)
+            for input_encoding in description.input_encodings
+        ] + [
+            OS("OutputEncoding", output_encoding)
+            for output_encoding in description.output_encodings
+        ])
     )

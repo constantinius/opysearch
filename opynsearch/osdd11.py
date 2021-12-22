@@ -2,19 +2,14 @@ from datetime import datetime, timedelta
 from io import BytesIO
 from typing import Any, cast, Callable, List, Optional, TypeVar, Union, BinaryIO
 
-from lxml.etree import QName, parse as parse_xml, _Element as Element, _ElementTree as ElementTree
-from lxml.builder import ElementMaker as LxmlElementMaker
+from lxml.etree import QName
 
 from .description import (
     Description, LimitType, StepType, SyndicationRight, Url, Image, Query, Parameter, Option,
     HttpMethod
 )
-
-class ElementMaker(LxmlElementMaker):
-    def __call__(self, tag, *children, **attrib):
-        children = [child for child in children if child is not None]
-        attrib = {k: v for k, v in attrib.items() if v is not None}
-        return super().__call__(tag, *children, **attrib)
+from .utils import unwrap, unwrap_default
+from .xml import ElementMaker, Element, parse_xml
 
 
 NS_OSDD = "http://a9.com/-/spec/opensearch/1.1/"
@@ -40,20 +35,6 @@ PARAM = ElementMaker(
     namespace=NS_PARAM,
     nsmap={None: NS_OSDD, "parameter": NS_PARAM}
 )
-
-T = TypeVar("T", int, float, str, SyndicationRight, List[str])
-
-
-def unwrap(raw: Optional[str], parser: Callable[[str], T], default: T = None) -> Optional[T]:
-    if raw is not None:
-        return parser(raw)
-    return default
-
-
-def unwrap_default(raw: Optional[str], parser: Callable[[str], T], default: T) -> T:
-    if raw is not None:
-        return parser(raw)
-    return default
 
 
 def parse_limit(value: str) -> LimitType:
@@ -81,14 +62,7 @@ def parse_step(value: str) -> StepType:
 
 
 def parse_osdd11(source: Union[BinaryIO, bytes]) -> Description:
-    if isinstance(source, bytes):
-        source = BytesIO(source)
-    tree: Union[Element, ElementTree] = parse_xml(source)
-    root = tree if isinstance(tree, Element) else tree.getroot()
-
-    if QName(root) != QName(NS_OSDD, "OpenSearchDescription"):
-        raise ValueError(f"Node {root} is not a valid OpenSearch 1.1 description")
-
+    root = parse_xml(source, (NS_OSDD, "OpenSearchDescription"))
     return Description(
         short_name=root.findtext("os:ShortName", namespaces=NAMESPACES),
         description=root.findtext("os:Description", namespaces=NAMESPACES),
@@ -109,40 +83,25 @@ def parse_osdd11(source: Union[BinaryIO, bytes]) -> Description:
                         maximum=int(param.attrib.get("maximum", 1)),
                         pattern=param.attrib.get("pattern"),
                         title=param.attrib.get("title"),
-                        min_exclusive=cast(
-                            LimitType,
-                            unwrap(
-                                param.attrib.get("minExclusive"),
-                                parse_limit,
-                            ),
+                        min_exclusive=unwrap(
+                            param.attrib.get("minExclusive"),
+                            parse_limit,
                         ),
-                        max_exclusive=cast(
-                            LimitType,
-                            unwrap(
-                                param.attrib.get("maxExclusive"),
-                                parse_limit,
-                            ),
+                        max_exclusive=unwrap(
+                            param.attrib.get("maxExclusive"),
+                            parse_limit,
                         ),
-                        min_inclusive=cast(
-                            LimitType,
-                            unwrap(
-                                param.attrib.get("minInclusive"),
-                                parse_limit,
-                            ),
+                        min_inclusive=unwrap(
+                            param.attrib.get("minInclusive"),
+                            parse_limit,
                         ),
-                        max_inclusive=cast(
-                            LimitType,
-                            unwrap(
-                                param.attrib.get("maxInclusive"),
-                                parse_limit,
-                            ),
+                        max_inclusive=unwrap(
+                            param.attrib.get("maxInclusive"),
+                            parse_limit,
                         ),
-                        step=cast(
-                            StepType,
-                            unwrap(
-                                param.attrib.get("step"),
-                                parse_limit,
-                            ),
+                        step=unwrap(
+                            param.attrib.get("step"),
+                            parse_limit,
                         ),
                         options=[
                             Option(option.attrib["value"], option.attrib.get("label"))
@@ -197,13 +156,10 @@ def parse_osdd11(source: Union[BinaryIO, bytes]) -> Description:
             SyndicationRight,
             SyndicationRight.open,
         ),
-        adult_content=cast(
-            bool,
-            unwrap_default(
-                root.findtext("os:AdultContent", namespaces=NAMESPACES),
-                lambda v: v.upper() not in ("false", "FALSE", "0", "no", "NO"),
-                False
-            )
+        adult_content=unwrap_default(
+            root.findtext("os:AdultContent", namespaces=NAMESPACES),
+            lambda v: v.upper() not in ("false", "FALSE", "0", "no", "NO"),
+            False
         ),
         languages=[
             lang.text

@@ -1,0 +1,76 @@
+<atom:feed xml:lang="en"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:gml="http://www.opengis.net/gml"
+  xmlns:georss="http://www.georss.org/georss"
+  xmlns:eop="http://a9.com/-/opensearch/extensions/eo/1.0/"
+  xmlns:eum="http://a9.com/-/opensearch/extensions/eumetsat/1.0/"
+  xmlns:time="http://a9.com/-/opensearch/extensions/time/1.0/"
+  xmlns:geo="http://a9.com/-/opensearch/extensions/geo/1.0/"
+  xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/"
+  xmlns:kml="http://earth.google.com/kml/2.2">
+  <atom:title>EUMETSAT Product Navigator COLOS Adaptor results feed</atom:title>
+  <atom:subtitle type="html">Number of results: 58</atom:subtitle>
+  <atom:id>http://46.51.189.235:80/atom</atom:id>
+  <atom:generator version="2.1" uri="http://46.51.189.235:80">EUMETSAT Product Navigator</atom:generator>
+  <atom:author>
+    <atom:name>EUMETSAT</atom:name>
+  </atom:author>
+  <atom:category>climatologyMeteorologyAtmosphere</atom:category>
+  <atom:contributor>con terra GmbH</atom:contributor>
+  <atom:rights>Copyright</atom:rights>
+  <atom:updated>2014-03-14T11:23:28Z</atom:updated>
+  <atom:icon>http://46.51.189.235:80/soapServices/feed-icon-14x14.png</atom:icon>
+  <atom:logo>http://46.51.189.235:80/soapServices/terraCatalog_feed.png</atom:logo>
+  <opensearch:totalResults>58</opensearch:totalResults>
+  <opensearch:startIndex>1</opensearch:startIndex>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:Query role="request" searchTerms="wind" startIndex="1" count="1"/>
+  <atom:link title="Product Navigator search" type="application/opensearchdescription+xml" href="http://46.51.189.235:80/soapServices/os-description.xml" rel="search"/>
+  <atom:link title="Product Navigator search" type="application/opensearchdescription+xml" href="http://46.51.189.235:80/soapServices/os-description.xml" rel="up"/>
+  <atom:link title="self" type="application/atom+xml" href="http://46.51.189.235:80/soapServices/OpenSearch?format=atom&amp;sI=1&amp;c=1&amp;q=wind" rel="self"/>
+  <atom:link title="next" type="application/atom+xml" href="http://46.51.189.235:80/soapServices/OpenSearch?format=atom&amp;sI=1&amp;c=1&amp;q=wind&amp;pw=2" rel="next"/>
+  <entry xml:lang="en"
+    xmlns="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:eum="http://www.eumetsat.int/2008/gmi"
+    xmlns:gmi="http://www.isotc211.org/2005/gmi">
+    <title>ASCAT AHRPT - Metop</title>
+    <category term="climatologyMeteorologyAtmosphere"/>
+    <category term="Observation"/>
+    <category term="Marine"/>
+    <category term="Satellite_Data"/>
+    <category term="Sea_Ice"/>
+    <id>EO:EUM:DAT:METOP:ASCATAHRPT</id>
+    <dc:identifier>EO:EUM:DAT:METOP:ASCATAHRPT</dc:identifier>
+    <link href="http://46.51.189.235:80/soapServices/CSWStartup?service=CSW&amp;version=2.0.2&amp;request=GetRecordById&amp;outputSchema=http://www.isotc211.org/2005/gmi&amp;Id=EO:EUM:DAT:METOP:ASCATAHRPT" rel="alternate" type="application/vnd.iso.19139+xml"/>
+    <link href="http://46.51.189.235:80/discovery/Start/DirectSearch/DetailResult.do?f(r0)=EO:EUM:DAT:METOP:ASCATAHRPT" rel="alternate" title="ASCAT AHRPT - Metop" type="text/html"/>
+    <generator uri="http://navigator.eumatsat.int" version="2.1">EUMETSAT Product Navigator</generator>
+    <author>
+      <name>EUMETSAT</name>
+      <email>ops@eumetsat.int</email>
+    </author>
+    <updated>2010-09-21</updated>
+    <summary>The prime objective of the Advanced SCATterometer (ASCAT) is to measure wind speed and direction over the oceans, and the main operational application is the assimilation of ocean winds in NWP models. Other operational applications, based on the use of measurements of the backscattering coefficient, are sea ice edge detection and monitoring, monitoring sea ice, snow cover, soil moisture and land surface parameters.</summary>
+    <georss:where>
+      <gml:Polygon srsName="urn:ogc:def:crs:EPSG:6.7:4326">
+        <gml:exterior>
+          <gml:LinearRing>
+            <gml:posList srsDimension="2">90.0 -180.0 -90.0 -180.0 -90.0 180.0 90.0 180.0 90.0 -180.0</gml:posList>
+          </gml:LinearRing>
+        </gml:exterior>
+      </gml:Polygon>
+    </georss:where>
+    <rights>-</rights>
+    <link href="http://www.eumetsat.int/Home/Main/Satellites/Metop/Services/SP_2010034162824650?l=en" rel="enclosure" title="Metop Direct Readout Service" type="text/html"/>
+    <content type="html"><![CDATA[<a href="http://www.eumetsat.int/Home/Main/Satellites/Metop/Services/SP_2010034162824650?l=en">Metop Direct Readout Service</a>
+       <br/>
+
+       <a href="http://46.51.189.235:80/discovery/Start/DirectSearch/DetailResult.do?f(r0)=EO:EUM:DAT:METOP:ASCATAHRPT">Metadata (HTML)</a>
+       <br/>
+       <a href="http://46.51.189.235:80/soapServices/CSWStartup?service=CSW&version=2.0.2&request=GetRecordById&outputSchema=http://www.isotc211.org/2005/gmi&Id=EO:EUM:DAT:METOP:ASCATAHRPT">Metadata (ISO19139 XML)</a>
+       <br/>
+       <a href="http://46.51.189.235:80/soapServices/OpenSearch?format=atom&id=EO:EUM:DAT:METOP:ASCATAHRPT">ATOM</a>
+       <br/>]]></content>
+  </entry>
+</atom:feed>

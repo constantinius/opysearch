@@ -6,7 +6,7 @@ from pygml.georss import parse_georss, NAMESPACE as NS_GEORSS
 from .osdd11 import NS_OSDD
 from .result import SearchResultItem, SearchResultPage
 from .utils import parse_datetime, unwrap
-from .xml import parse_xml
+from .xml import parse_xml, unwrap_element
 
 
 NS_ATOM = "http://www.w3.org/2005/Atom"
@@ -51,23 +51,28 @@ def parse_atom_feed(source: Union[BinaryIO, bytes]) -> SearchResultPage:
                     contributor.text
                     for contributor in entry.findall("atom:contributor", NAMESPACES)
                 ],
-                modified=unwrap(entry.findtext("atom:updated", namespaces=NAMESPACES), parse_temporal),
-                date=unwrap(entry.findtext("dc:date", namespaces=NAMESPACES), parse_temporal),
+                modified=unwrap(
+                    entry.findtext("atom:updated", namespaces=NAMESPACES),
+                    parse_temporal,
+                ),
+                date=unwrap(
+                    entry.findtext("dc:date", namespaces=NAMESPACES), parse_temporal
+                ),
                 sources=[
                     source.text
                     for source in entry.findall("atom:link[@rel='via']", NAMESPACES)
                 ],
                 language=entry.findtext("atom:language", namespaces=NAMESPACES),
                 rights=entry.findtext("atom:rights", namespaces=NAMESPACES),
-                envelope=unwrap(entry.find("georss:*", NAMESPACES), parse_georss),  # TODO
-
+                envelope=unwrap(
+                    entry.find("georss:*", NAMESPACES), parse_georss
+                ),
             )
             for entry in root.findall("atom:entry", NAMESPACES)
         ],
         creator=root.findtext("atom:creator", namespaces=NAMESPACES),
         subjects=[
-            category.text
-            for category in root.findall("atom:category", NAMESPACES)
+            category.text for category in root.findall("atom:category", NAMESPACES)
         ],
         abstract=root.findtext("atom:summary", namespaces=NAMESPACES),
         publisher=root.findtext("atom:generator", namespaces=NAMESPACES),
@@ -75,9 +80,30 @@ def parse_atom_feed(source: Union[BinaryIO, bytes]) -> SearchResultPage:
             contributor.text
             for contributor in root.findall("atom:contributor", NAMESPACES)
         ],
-        modified=unwrap(root.findtext("atom:updated", namespaces=NAMESPACES), parse_temporal),
+        modified=unwrap(
+            root.findtext("atom:updated", namespaces=NAMESPACES), parse_temporal
+        ),
         identifier=root.findtext("dc:identifier", namespaces=NAMESPACES),
         language=root.findtext("atom:language", namespaces=NAMESPACES),
         rights=root.findtext("atom:rights", namespaces=NAMESPACES),
         envelopes=[],
+        next_page=unwrap_element(
+            root.find("atom:link[@rel='next']", namespaces=NAMESPACES),
+            lambda l: l.attrib["href"],
+        ),
+        previous_page=unwrap_element(
+            root.find(
+                "atom:link[@rel='prev'] | atom:link[@rel='previous']",
+                namespaces=NAMESPACES,
+            ),
+            lambda l: l.attrib["href"],
+        ),
+        first_page=unwrap_element(
+            root.find("atom:link[@rel='first']", namespaces=NAMESPACES),
+            lambda l: l.attrib["href"],
+        ),
+        last_page=unwrap_element(
+            root.find("atom:link[@rel='last']", namespaces=NAMESPACES),
+            lambda l: l.attrib["href"],
+        ),
     )

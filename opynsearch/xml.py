@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import BinaryIO, Optional, Tuple, Union
+from typing import BinaryIO, Callable, Optional, Tuple, TypeVar, Union
 
 from lxml.etree import QName, parse, _Element as Element, _ElementTree as ElementTree
 from lxml.builder import ElementMaker as LxmlElementMaker
@@ -29,3 +29,11 @@ def parse_xml(source: Union[BinaryIO, bytes], expected_root_tag: Optional[Tuple[
         raise ValueError(f"Node {root} is not allowed. Expected {expected_root_tag}")
 
     return root
+
+
+T = TypeVar("T")
+
+def unwrap_element(element: Optional[Element], parser: Callable[[Element], T], default: T = None) -> Optional[T]:
+    if element is not None:
+        return parser(element)
+    return default

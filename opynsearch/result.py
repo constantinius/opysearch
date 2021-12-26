@@ -40,6 +40,10 @@ class SearchResultPage:
     rights: Optional[str] = None
     envelopes: List[str] = field(default_factory=list)
 
+    next_page: Optional[str] = None
+    previous_page: Optional[str] = None
+    first_page: Optional[str] = None
+    last_page: Optional[str] = None
 
 
 @dataclass

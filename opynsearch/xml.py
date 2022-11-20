@@ -33,7 +33,8 @@ def parse_xml(source: Union[BinaryIO, bytes], expected_root_tag: Optional[Tuple[
 
 T = TypeVar("T")
 
-def unwrap_element(element: Optional[Element], parser: Callable[[Element], T], default: T = None) -> Optional[T]:
+
+def unwrap_element(element: Optional[Element], parser: Callable[[Element], T], default: Optional[T] = None) -> Optional[T]:
     if element is not None:
         return parser(element)
     return default

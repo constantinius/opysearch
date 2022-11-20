@@ -7,7 +7,7 @@ import iso8601
 T = TypeVar("T")
 
 
-def unwrap(raw: Optional[str], parser: Callable[[str], T], default: T = None) -> Optional[T]:
+def unwrap(raw: Optional[str], parser: Callable[[str], T], default: Optional[T] = None) -> Optional[T]:
     if raw is not None:
         return parser(raw)
     return default

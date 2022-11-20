@@ -2,8 +2,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Iterator, List, Optional, Tuple, Union
 
-from opynsearch.description import Option
-
 
 @dataclass
 class SearchResult:
